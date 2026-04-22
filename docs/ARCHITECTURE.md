@@ -1,11 +1,11 @@
 ## Architecture and System Design
-## Name: FAMOUS
+## Name:FAMOUS AKPOVOGBETA
 ## Index Number: 10211100297
 
 ### High-Level Data Flow
 
 ```mermaid
-flowchart LR
+flowchart TD
   A[User Query] --> B[Query Expansion]
   B --> C[Embedding]
   C --> D[Hybrid Retrieval\nVector + Keyword]

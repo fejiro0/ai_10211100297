@@ -64,6 +64,7 @@ def fetch_election_csv() -> pd.DataFrame:
     df = pd.read_csv(io.StringIO(response.text))
 
     # Cleaning: trim headers/strings, remove exact duplicates, fill numeric NaN with 0.
+    # In handling the missing data set i filled the numeric columns with 0
     df.columns = [c.strip() for c in df.columns]
     for col in df.select_dtypes(include="object").columns:
         df[col] = df[col].astype(str).str.strip()
@@ -210,7 +211,7 @@ Context:
 User Question:
 {user_query}
 
-Answer in 4-7 concise bullet points and cite chunk IDs used.
+Answer in 4-7 concise bullet points and cite chunk IDs used
 """.strip()
     return prompt
 
