@@ -20,6 +20,11 @@ Implemented with:
 - Query expansion extension
 - Prompt construction with hallucination guardrail
 - Stage-by-stage logs in UI
+- Prompt-style A/B/C testing in UI
+- RAG vs no-retrieval baseline comparison panel
+- Adversarial testing panel
+- Exportable JSONL experiment/stage logs
+- Innovation: feedback-driven source bias for retrieval ranking
 
 ## 2) Required Datasets
 
@@ -73,17 +78,19 @@ streamlit run app.py
   - Retrieved chunks
   - Similarity/keyword/final scores
   - Final prompt sent to generator
+  - Session stage logs and JSONL export
 
 ### Part E: Critical Evaluation & Adversarial Testing
 - Includes adversarial and ambiguous queries in experiment log.
 - Compares RAG response behavior against no-retrieval baseline (manual comparison log).
+- Provides in-app adversarial panel + baseline comparison panel for repeatable tests.
 
 ### Part F: Architecture & System Design
 - Architecture documented in `docs/ARCHITECTURE.md`.
 - Includes component interactions and design justification.
 
 ### Part G: Innovation Component
-- Novel feature included: **query expansion + hybrid domain scoring** to improve retrieval robustness.
+- Novel feature included: **feedback-driven source bias** (`Helpful/Not helpful`) that adjusts future retrieval scoring.
 
 ## 5) Final Deliverables Checklist
 
@@ -96,6 +103,7 @@ streamlit run app.py
 - [ ] Video walkthrough (<=2 minutes): add your link in `docs/DELIVERY.md`
 - [x] Manual experiment logs in `docs/EXPERIMENT_LOG.md`
 - [x] Architecture explanation in `docs/ARCHITECTURE.md`
+- [x] Answer strategy in `docs/ANSWER_STRATEGY.md`
 - [ ] Deployment URL: add your cloud URL in `docs/DELIVERY.md`
 
 ## 6) Submission Compliance Notes

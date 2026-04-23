@@ -9,10 +9,12 @@ flowchart TD
   A[User Query] --> B[Query Expansion]
   B --> C[Embedding]
   C --> D[Hybrid Retrieval\nVector + Keyword]
+  D --> D2[Feedback Bias Adjustment\n(innovation)]
   D --> E[Top-k Context Selection]
   E --> F[Prompt Builder\nHallucination Guard]
   F --> G[LLM / Grounded Generator]
-  G --> H[Response + Logs]
+  G --> H[Response + Stage Logs]
+  H --> I[Manual Experiment Export\n(JSONL)]
 ```
 
 ### Components
@@ -26,6 +28,10 @@ flowchart TD
   - Cosine similarity + keyword overlap combined with weighted scoring.
 - **Prompt Layer**
   - Injects selected context and strict fallback rule for uncertain answers.
+- **Evaluation Layer**
+  - RAG vs no-retrieval baseline panel, adversarial query panel, and response consistency score.
+- **Innovation Layer**
+  - Source-feedback bias (`Helpful/Not helpful`) updates source score offset for future retrieval.
 - **Presentation Layer**
   - Streamlit UI shows answer, retrieved chunks, scores, and final prompt.
 

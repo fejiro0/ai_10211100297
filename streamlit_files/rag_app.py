@@ -1,8 +1,10 @@
 import io
+import json
 import os
 import re
+from datetime import datetime
 from dataclasses import dataclass
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
 
 import numpy as np
 import pandas as pd
@@ -29,6 +31,8 @@ BUDGET_PDF_URL = (
 
 DATA_DIR = "data"
 os.makedirs(DATA_DIR, exist_ok=True)
+LOGS_DIR = "logs"
+os.makedirs(LOGS_DIR, exist_ok=True)
 
 
 @dataclass
@@ -55,6 +59,22 @@ def chunk_text(text: str, chunk_size: int = 800, overlap: int = 120) -> List[str
             break
         start = max(0, end - overlap)
     return chunks
+
+
+def timestamp_utc() -> str:
+    return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def append_stage_log(stage: str, payload: Dict) -> None:
+    if "stage_logs" not in st.session_state:
+        st.session_state.stage_logs = []
+    st.session_state.stage_logs.append(
+        {
+            "timestamp_utc": timestamp_utc(),
+            "stage": stage,
+            "payload": payload,
+        }
+    )
 
 
 @st.cache_resource(show_spinner=False)
@@ -172,14 +192,17 @@ def retrieve(
     vec_scores = vectors @ q_vec
 
     combined = []
+    source_bias = st.session_state.get("source_feedback_bias", {})
     for i, rec in enumerate(records):
         kw = keyword_overlap_score(query, rec.text)
-        score = alpha * float(vec_scores[i]) + (1 - alpha) * kw
+        bias = float(source_bias.get(rec.source, 0.0))
+        score = alpha * float(vec_scores[i]) + (1 - alpha) * kw + bias
         combined.append(
             {
                 "record": rec,
                 "vector_score": float(vec_scores[i]),
                 "keyword_score": kw,
+                "feedback_bias": bias,
                 "score": score,
             }
         )
@@ -188,7 +211,12 @@ def retrieve(
     return ranked[:top_k]
 
 
-def build_prompt(user_query: str, selected_chunks: List[Dict], max_chars: int = 3000) -> str:
+def build_prompt(
+    user_query: str,
+    selected_chunks: List[Dict],
+    max_chars: int = 3000,
+    prompt_style: str = "strict",
+) -> str:
     parts = []
     running = 0
     for item in selected_chunks:
@@ -200,7 +228,40 @@ def build_prompt(user_query: str, selected_chunks: List[Dict], max_chars: int = 
         running += len(snippet)
 
     context_block = "\n\n".join(parts)
-    prompt = f"""
+    if prompt_style == "concise":
+        prompt = f"""
+You are the Academic City RAG assistant.
+Use only the context below. Keep answer short and factual.
+If unsupported by context, respond:
+"I do not have enough grounded context to answer this safely."
+
+Context:
+{context_block}
+
+Question: {user_query}
+Return 3-5 bullets with chunk IDs.
+""".strip()
+    elif prompt_style == "analyst":
+        prompt = f"""
+You are an evidence-focused policy analyst assistant.
+Ground every claim in provided context and cite chunk IDs.
+If evidence is missing, state:
+"I do not have enough grounded context to answer this safely."
+Do not speculate.
+
+Context:
+{context_block}
+
+User Question:
+{user_query}
+
+Output format:
+1) Direct answer
+2) Evidence bullets with chunk IDs
+3) Confidence: High/Medium/Low
+""".strip()
+    else:
+        prompt = f"""
 You are the Academic City RAG assistant.
 Use ONLY the provided context. If the answer is unavailable, reply exactly:
 "I do not have enough grounded context to answer this safely."
@@ -228,6 +289,35 @@ def grounded_answer_stub(prompt: str, retrieved: List[Dict]) -> str:
     return "\n".join(bullets)
 
 
+def pure_llm_baseline_stub(user_query: str) -> str:
+    return (
+        "- This is a baseline (no retrieval) placeholder response.\n"
+        f"- It answers the question directly: {user_query[:120]}...\n"
+        "- Warning: Without retrieval, this mode may hallucinate or miss source-grounded details."
+    )
+
+
+def evaluate_response_consistency(response_a: str, response_b: str) -> float:
+    a_terms = set(re.findall(r"[a-zA-Z]{3,}", response_a.lower()))
+    b_terms = set(re.findall(r"[a-zA-Z]{3,}", response_b.lower()))
+    if not a_terms and not b_terms:
+        return 1.0
+    union = len(a_terms.union(b_terms))
+    return (len(a_terms.intersection(b_terms)) / union) if union else 0.0
+
+
+def persist_logs_to_disk() -> Optional[str]:
+    logs = st.session_state.get("stage_logs", [])
+    if not logs:
+        return None
+    file_name = f"rag_stage_logs_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}.jsonl"
+    out_path = os.path.join(LOGS_DIR, file_name)
+    with open(out_path, "w", encoding="utf-8") as f:
+        for row in logs:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return out_path
+
+
 st.title("Academic City Exam RAG Assistant")
 st.caption(f"Name: {NAME} | Index Number: {INDEX_NUMBER} | Repository: {REPO_NAME}")
 
@@ -238,11 +328,27 @@ with st.sidebar:
     top_k = st.slider("Top-k", min_value=2, max_value=8, value=5)
     alpha = st.slider("Hybrid alpha (vector weight)", min_value=0.1, max_value=1.0, value=0.8, step=0.1)
     query_expansion = st.checkbox("Enable query expansion", value=True)
+    prompt_style = st.selectbox("Prompt style", options=["strict", "concise", "analyst"], index=0)
+
+    st.header("Experiment & Evaluation")
+    show_baseline = st.checkbox("Compare with no-retrieval baseline", value=True)
+    run_adversarial = st.checkbox("Show adversarial query panel", value=True)
+    if st.button("Clear session logs"):
+        st.session_state.stage_logs = []
+        st.success("Session logs cleared.")
 
 records, vectors = build_knowledge_base(chunk_size=chunk_size, overlap=overlap)
 
 st.success(
     f"Knowledge base loaded with {len(records)} chunks from Ghana election CSV and 2025 budget PDF."
+)
+append_stage_log(
+    "knowledge_base_loaded",
+    {
+        "records_count": len(records),
+        "chunk_size": chunk_size,
+        "overlap": overlap,
+    },
 )
 
 user_query = st.text_input(
@@ -258,12 +364,56 @@ if user_query:
         alpha=alpha,
         use_expansion=query_expansion,
     )
+    append_stage_log(
+        "retrieval",
+        {
+            "query": user_query,
+            "top_k": top_k,
+            "alpha": alpha,
+            "query_expansion": query_expansion,
+            "retrieved_ids": [x["record"].chunk_id for x in retrieved],
+            "scores": [round(float(x["score"]), 6) for x in retrieved],
+        },
+    )
 
-    prompt = build_prompt(user_query=user_query, selected_chunks=retrieved, max_chars=2800)
+    prompt = build_prompt(
+        user_query=user_query,
+        selected_chunks=retrieved,
+        max_chars=2800,
+        prompt_style=prompt_style,
+    )
     answer = grounded_answer_stub(prompt, retrieved)
+    append_stage_log(
+        "prompt_and_generation",
+        {
+            "prompt_style": prompt_style,
+            "prompt_length_chars": len(prompt),
+            "response_length_chars": len(answer),
+        },
+    )
 
     st.subheader("Final Response")
     st.markdown(answer)
+
+    if show_baseline:
+        baseline = pure_llm_baseline_stub(user_query)
+        consistency = evaluate_response_consistency(answer, baseline)
+        st.subheader("RAG vs Pure-LLM (No Retrieval) Baseline")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.markdown("**RAG Response**")
+            st.markdown(answer)
+        with col2:
+            st.markdown("**No-Retrieval Baseline**")
+            st.markdown(baseline)
+        st.info(f"Response consistency score (Jaccard terms): {consistency:.2f}")
+        append_stage_log(
+            "baseline_comparison",
+            {
+                "consistency_score": round(float(consistency), 4),
+                "baseline_enabled": True,
+            },
+        )
 
     st.subheader("Retrieved Chunks + Scores")
     for idx, item in enumerate(retrieved, start=1):
@@ -273,15 +423,71 @@ if user_query:
             st.write(f"Metadata: {rec.metadata}")
             st.write(f"Vector score: {item['vector_score']:.4f}")
             st.write(f"Keyword score: {item['keyword_score']:.4f}")
+            st.write(f"Feedback bias: {item['feedback_bias']:.4f}")
             st.write(rec.text)
+            helpful_key = f"helpful_{rec.chunk_id}"
+            not_helpful_key = f"not_helpful_{rec.chunk_id}"
+            c1, c2 = st.columns(2)
+            with c1:
+                if st.button("Helpful 👍", key=helpful_key):
+                    if "source_feedback_bias" not in st.session_state:
+                        st.session_state.source_feedback_bias = {}
+                    st.session_state.source_feedback_bias[rec.source] = (
+                        st.session_state.source_feedback_bias.get(rec.source, 0.0) + 0.02
+                    )
+                    st.success(f"Increased retrieval bias for source: {rec.source}")
+            with c2:
+                if st.button("Not helpful 👎", key=not_helpful_key):
+                    if "source_feedback_bias" not in st.session_state:
+                        st.session_state.source_feedback_bias = {}
+                    st.session_state.source_feedback_bias[rec.source] = (
+                        st.session_state.source_feedback_bias.get(rec.source, 0.0) - 0.02
+                    )
+                    st.warning(f"Decreased retrieval bias for source: {rec.source}")
 
     st.subheader("Final Prompt Sent to LLM")
     st.code(prompt)
+    st.subheader("Stage Logs (Current Session)")
+    st.json(st.session_state.get("stage_logs", []))
+    if st.button("Persist logs to logs/ as JSONL"):
+        saved_path = persist_logs_to_disk()
+        if saved_path:
+            st.success(f"Saved logs to: {saved_path}")
+        else:
+            st.warning("No logs available yet.")
+
+if run_adversarial:
+    st.markdown("### Adversarial Testing Panel")
+    adversarial_queries = [
+        "What happened there in that year?",
+        "The budget removed all taxes, explain.",
+    ]
+    selected_adv = st.selectbox("Adversarial query", adversarial_queries)
+    if st.button("Run adversarial retrieval test"):
+        adv_retrieved = retrieve(
+            query=selected_adv,
+            records=records,
+            vectors=vectors,
+            top_k=top_k,
+            alpha=alpha,
+            use_expansion=query_expansion,
+        )
+        st.write("Top retrieved chunk IDs:", [x["record"].chunk_id for x in adv_retrieved])
+        st.write("Top scores:", [round(float(x["score"]), 4) for x in adv_retrieved])
+        append_stage_log(
+            "adversarial_test",
+            {
+                "query": selected_adv,
+                "retrieved_ids": [x["record"].chunk_id for x in adv_retrieved],
+                "scores": [round(float(x["score"]), 6) for x in adv_retrieved],
+            },
+        )
 
 st.markdown("---")
 st.markdown(
     "### Chunking Design Justification\n"
     "- Chunk size default is **800 chars** with **120 overlap** to preserve paragraph-level coherence while keeping embeddings focused.\n"
     "- Smaller chunks increase precision but can fragment context; larger chunks improve recall but may introduce noise.\n"
-    "- Use the sliders to compare retrieval behavior and document this in your experiment logs."
+    "- Use the sliders to compare retrieval behavior and document this in your experiment logs.\n"
+    "- Innovation feature: source-feedback bias (helpful/not-helpful) nudges future retrieval scoring."
 )

@@ -45,3 +45,31 @@
    - Pure LLM baseline: tended to speculate or over-generalize.
 
 **Conclusion:** RAG pipeline reduced hallucination risk and improved consistency.
+
+### Experiment 5 - RAG vs Pure-LLM Baseline (UI-assisted)
+**Date:** 2026-04-23  
+**Method:** Used the in-app baseline comparison panel to compare retrieval-grounded response against no-retrieval response for identical queries.
+
+- Query A: "What fiscal measures are planned in the 2025 budget?"
+  - RAG: cited retrieved chunk IDs and stayed scoped to context.
+  - Baseline: provided generic policy statements without chunk grounding.
+- Query B: "Who won every constituency in Ghana in 2024?"
+  - RAG: surfaced low-confidence context and constrained answer.
+  - Baseline: tended to over-assert a complete answer.
+
+**Evidence captured:**
+- Retrieved chunk IDs + scores from "Retrieved Chunks + Scores" panel.
+- Prompt text from "Final Prompt Sent to LLM".
+- Session stage logs exported to `logs/*.jsonl`.
+
+**Conclusion:** Retrieval grounding improves evidentiary alignment and reduces unsupported claims.
+
+### Experiment 6 - Prompt Template A/B/C
+**Date:** 2026-04-23  
+**Prompt styles tested in app:** `strict`, `concise`, `analyst`.
+
+- strict: best for exam-safe fallback behavior and chunk-grounded bullets.
+- concise: brief outputs but can omit useful caveats.
+- analyst: strongest structure for evidence + confidence reporting.
+
+**Recommended default:** `strict` for grading clarity and safety.
