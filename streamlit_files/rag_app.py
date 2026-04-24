@@ -488,6 +488,4 @@ st.markdown(
     "### Chunking Design Justification\n"
     "- Chunk size default is **800 chars** with **120 overlap** to preserve paragraph-level coherence while keeping embeddings focused.\n"
     "- Smaller chunks increase precision but can fragment context; larger chunks improve recall but may introduce noise.\n"
-    "- Use the sliders to compare retrieval behavior and document this in your experiment logs.\n"
-    "- Innovation feature: source-feedback bias (helpful/not-helpful) nudges future retrieval scoring."
 )

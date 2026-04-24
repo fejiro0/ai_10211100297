@@ -2,7 +2,7 @@
 ## Name:FAMOUS AKPOVOGBETA
 ## Index Number: 10211100297
 
-> NOTE: This log is manually written from observed test runs.
+NOTE: This log was manually written from observed test runs.
 
 ### Experiment 1 - Chunk Size Impact
 **Date:** 2026-04-20  

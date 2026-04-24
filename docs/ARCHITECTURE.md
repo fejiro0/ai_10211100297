@@ -9,12 +9,12 @@ flowchart TD
   A[User Query] --> B[Query Expansion]
   B --> C[Embedding]
   C --> D[Hybrid Retrieval\nVector + Keyword]
-  D --> D2[Feedback Bias Adjustment\n(innovation)]
+  D --> D2["Feedback Bias Adjustment\n(innovation)"]
   D --> E[Top-k Context Selection]
   E --> F[Prompt Builder\nHallucination Guard]
   F --> G[LLM / Grounded Generator]
   G --> H[Response + Stage Logs]
-  H --> I[Manual Experiment Export\n(JSONL)]
+  H --> I["Manual Experiment Export\n(JSONL)"]
 ```
 
 ### Components

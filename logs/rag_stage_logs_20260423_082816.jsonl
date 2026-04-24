@@ -1,0 +1,29 @@
+{"timestamp_utc": "2026-04-23T08:18:52Z", "stage": "knowledge_base_loaded", "payload": {"records_count": 1978, "chunk_size": 800, "overlap": 300}}
+{"timestamp_utc": "2026-04-23T08:18:52Z", "stage": "retrieval", "payload": {"query": "What budget really stood out in the budget ", "top_k": 5, "alpha": 0.8, "query_expansion": true, "retrieved_ids": ["pdf-63-1", "pdf-62-0", "pdf-39-0", "pdf-36-0", "pdf-35-4"], "scores": [0.507567, 0.495065, 0.486824, 0.485297, 0.482528]}}
+{"timestamp_utc": "2026-04-23T08:18:52Z", "stage": "prompt_and_generation", "payload": {"prompt_style": "strict", "prompt_length_chars": 2829, "response_length_chars": 613}}
+{"timestamp_utc": "2026-04-23T08:18:52Z", "stage": "baseline_comparison", "payload": {"consistency_score": 0.0455, "baseline_enabled": true}}
+{"timestamp_utc": "2026-04-23T08:19:00Z", "stage": "knowledge_base_loaded", "payload": {"records_count": 1978, "chunk_size": 800, "overlap": 300}}
+{"timestamp_utc": "2026-04-23T08:19:00Z", "stage": "retrieval", "payload": {"query": "What budget really stood out in the budget ", "top_k": 5, "alpha": 0.8, "query_expansion": true, "retrieved_ids": ["pdf-63-1", "pdf-62-0", "pdf-39-0", "pdf-36-0", "pdf-35-4"], "scores": [0.507567, 0.495065, 0.486824, 0.485297, 0.482528]}}
+{"timestamp_utc": "2026-04-23T08:19:00Z", "stage": "prompt_and_generation", "payload": {"prompt_style": "strict", "prompt_length_chars": 2829, "response_length_chars": 613}}
+{"timestamp_utc": "2026-04-23T08:19:00Z", "stage": "baseline_comparison", "payload": {"consistency_score": 0.0455, "baseline_enabled": true}}
+{"timestamp_utc": "2026-04-23T08:19:04Z", "stage": "knowledge_base_loaded", "payload": {"records_count": 1978, "chunk_size": 800, "overlap": 300}}
+{"timestamp_utc": "2026-04-23T08:19:04Z", "stage": "retrieval", "payload": {"query": "What budget really stood out in the budget ", "top_k": 5, "alpha": 0.8, "query_expansion": true, "retrieved_ids": ["pdf-63-1", "pdf-62-0", "pdf-39-0", "pdf-36-0", "pdf-35-4"], "scores": [0.507567, 0.495065, 0.486824, 0.485297, 0.482528]}}
+{"timestamp_utc": "2026-04-23T08:19:04Z", "stage": "prompt_and_generation", "payload": {"prompt_style": "strict", "prompt_length_chars": 2829, "response_length_chars": 613}}
+{"timestamp_utc": "2026-04-23T08:19:04Z", "stage": "baseline_comparison", "payload": {"consistency_score": 0.0455, "baseline_enabled": true}}
+{"timestamp_utc": "2026-04-23T08:19:04Z", "stage": "adversarial_test", "payload": {"query": "The budget removed all taxes, explain.", "retrieved_ids": ["pdf-62-0", "pdf-39-0", "pdf-61-0", "pdf-36-0", "pdf-63-1"], "scores": [0.511241, 0.486618, 0.4838, 0.449999, 0.449705]}}
+{"timestamp_utc": "2026-04-23T08:21:24Z", "stage": "knowledge_base_loaded", "payload": {"records_count": 1643, "chunk_size": 800, "overlap": 40}}
+{"timestamp_utc": "2026-04-23T08:21:24Z", "stage": "retrieval", "payload": {"query": "What budget really stood out in the budget ", "top_k": 5, "alpha": 0.8, "query_expansion": true, "retrieved_ids": ["pdf-63-1", "pdf-77-3", "pdf-36-1", "pdf-62-0", "pdf-93-1"], "scores": [0.509004, 0.503487, 0.499687, 0.495065, 0.494961]}}
+{"timestamp_utc": "2026-04-23T08:21:24Z", "stage": "prompt_and_generation", "payload": {"prompt_style": "strict", "prompt_length_chars": 2610, "response_length_chars": 614}}
+{"timestamp_utc": "2026-04-23T08:21:24Z", "stage": "baseline_comparison", "payload": {"consistency_score": 0.0317, "baseline_enabled": true}}
+{"timestamp_utc": "2026-04-23T08:27:33Z", "stage": "knowledge_base_loaded", "payload": {"records_count": 1643, "chunk_size": 800, "overlap": 40}}
+{"timestamp_utc": "2026-04-23T08:27:33Z", "stage": "retrieval", "payload": {"query": "basic context + question only", "top_k": 5, "alpha": 0.8, "query_expansion": true, "retrieved_ids": ["pdf-100-4", "pdf-60-3", "pdf-118-1", "pdf-115-1", "pdf-10-0"], "scores": [0.200233, 0.189084, 0.179145, 0.164645, 0.158199]}}
+{"timestamp_utc": "2026-04-23T08:27:33Z", "stage": "prompt_and_generation", "payload": {"prompt_style": "strict", "prompt_length_chars": 2571, "response_length_chars": 500}}
+{"timestamp_utc": "2026-04-23T08:27:33Z", "stage": "baseline_comparison", "payload": {"consistency_score": 0.0615, "baseline_enabled": true}}
+{"timestamp_utc": "2026-04-23T08:27:56Z", "stage": "knowledge_base_loaded", "payload": {"records_count": 1643, "chunk_size": 800, "overlap": 40}}
+{"timestamp_utc": "2026-04-23T08:27:56Z", "stage": "retrieval", "payload": {"query": "context + strict hallucination fallback + bullet formatting + chunk citation instruction.", "top_k": 5, "alpha": 0.8, "query_expansion": true, "retrieved_ids": ["pdf-14-1", "pdf-129-2", "pdf-100-4", "pdf-128-2", "pdf-107-3"], "scores": [0.217853, 0.204697, 0.197503, 0.195975, 0.188896]}}
+{"timestamp_utc": "2026-04-23T08:27:56Z", "stage": "prompt_and_generation", "payload": {"prompt_style": "strict", "prompt_length_chars": 2983, "response_length_chars": 500}}
+{"timestamp_utc": "2026-04-23T08:27:56Z", "stage": "baseline_comparison", "payload": {"consistency_score": 0.0299, "baseline_enabled": true}}
+{"timestamp_utc": "2026-04-23T08:28:16Z", "stage": "knowledge_base_loaded", "payload": {"records_count": 1643, "chunk_size": 800, "overlap": 40}}
+{"timestamp_utc": "2026-04-23T08:28:16Z", "stage": "retrieval", "payload": {"query": "context + strict hallucination fallback + bullet formatting + chunk citation instruction.", "top_k": 5, "alpha": 0.8, "query_expansion": true, "retrieved_ids": ["pdf-14-1", "pdf-129-2", "pdf-100-4", "pdf-128-2", "pdf-107-3"], "scores": [0.217853, 0.204697, 0.197503, 0.195975, 0.188896]}}
+{"timestamp_utc": "2026-04-23T08:28:16Z", "stage": "prompt_and_generation", "payload": {"prompt_style": "strict", "prompt_length_chars": 2983, "response_length_chars": 500}}
+{"timestamp_utc": "2026-04-23T08:28:16Z", "stage": "baseline_comparison", "payload": {"consistency_score": 0.0299, "baseline_enabled": true}}
