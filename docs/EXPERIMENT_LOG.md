@@ -6,7 +6,7 @@ NOTE: This log was manually written from observed test runs.
 
 ### Experiment 1 - Chunk Size Impact
 **Date:** 2026-04-20  
-**Query:** "What fiscal measures are planned in the 2025 budget?"
+**Query:** "What does the 2025 Expenditure Measure says?"
 
 - Run A: chunk_size=400, overlap=80
   - Observation: higher precision, but answers missed broader policy context.
