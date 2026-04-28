@@ -111,7 +111,7 @@ streamlit run app.py
 - Add/invite collaborator: `godwin.danso@acity.edu.gh` or `GodwinDansoAcity`.
 - Send GitHub + deployment links to: `godwin.danso@acity.edu.gh`.
 - Email subject format:
-  `CS4241-Introduction to Artificial Intelligence-2026:10211100294 EKENG JOEL EFFIONG`
+  `CS4241-Introduction to Artificial Intelligence-2026:10211100297 Famous Akpovogbeta`
 
 ## 7) Academic Integrity
 
